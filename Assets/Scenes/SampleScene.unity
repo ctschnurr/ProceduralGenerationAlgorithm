@@ -154,8 +154,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fullWallPrefab: {fileID: 5904044617458815767, guid: b75a044beb3ff5a468fb3b19b64904cd, type: 3}
   cornerAPrefab: {fileID: 5904044617458815767, guid: 7d978ea32fe62fd4185cb2a6ea3ec936, type: 3}
-  dungeonDimensionsRows: 5
-  dungeonDimensionsColumns: 5
+  cornerBPrefab: {fileID: 5904044617458815767, guid: 24f80bba009eb1d40a791995d22c7908, type: 3}
+  cornerCPrefab: {fileID: 5904044617458815767, guid: 316a58cb34d359344aca35f570ad17cc, type: 3}
+  cornerDPrefab: {fileID: 5904044617458815767, guid: 116388f9f49b05447b35ceb8242a7c1c, type: 3}
+  hallwayHPrefab: {fileID: 5904044617458815767, guid: 51cdb8ede5ca8544a859ed24269e4351, type: 3}
+  hallwayVPrefab: {fileID: 5904044617458815767, guid: ee54e43db5210e24cbdd582cd245dc6d, type: 3}
+  intersectionPrefab: {fileID: 5904044617458815767, guid: 7d8ad31f0bbaa12408aa74719c81eb25, type: 3}
+  startAPrefab: {fileID: 5904044617458815767, guid: 3c71173111d3d084daaba4ca59302ea2, type: 3}
+  startBPrefab: {fileID: 5904044617458815767, guid: 8fb0eb90b89a80448bc7cee0fcb9d513, type: 3}
+  startCPrefab: {fileID: 5904044617458815767, guid: 8965fd9c99021214586900e44e18d25b, type: 3}
+  startDPrefab: {fileID: 5904044617458815767, guid: 8c403a853e02e3c4b965454149ff9864, type: 3}
+  tCornerAPrefab: {fileID: 5904044617458815767, guid: 44e74ded149db174a8ef88f2b49f92d9, type: 3}
+  tCornerBPrefab: {fileID: 5904044617458815767, guid: 61034d640f1da9f4c8ca54e71959a1a6, type: 3}
+  tCornerCPrefab: {fileID: 5904044617458815767, guid: 7eca37acb91d67c4bbd4d25a48001120, type: 3}
+  tCornerDPrefab: {fileID: 5904044617458815767, guid: 380dfdbf69f919d40956cd7aa1d488b8, type: 3}
+  dungeonDimensionsRows: 20
+  dungeonDimensionsColumns: 15
 --- !u!4 &139229380
 Transform:
   m_ObjectHideFlags: 0
