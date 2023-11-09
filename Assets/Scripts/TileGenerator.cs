@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TileGenerator : MonoBehaviour
@@ -158,132 +159,108 @@ public class TileGenerator : MonoBehaviour
     {
         tiles = new Tile[dungeonDimensionsRows, dungeonDimensionsColumns];
         SetupTiles();
-        DrawBorder();
+        CreateBase();
         PickStart();
-        BuildMaze(tiles[startX, startY]);
+        //BuildMaze(tiles[startX, startY]);
 
-        while (nextTiles.Count > 0)
+
+
+        // Tile next = nextTiles.Dequeue();
+        // BuildMaze(next);
+        // PickTile(next, tileList);
+
+        InstantiateDungeon();
+        // DrawBorder();
+        // BuildMaze(tiles[startX, startY]);
+
+        // while (nextTiles.Count > 0)
+        // {
+        //     Tile next = nextTiles.Dequeue();
+        //     BuildMaze(next);
+        // }
+    }
+
+    void CreateBase()
+    {
+        for (int x = 0; x < dungeonDimensionsRows; x++)
         {
-            Tile next = nextTiles.Dequeue();
-            BuildMaze(next);
+            for (int y  = 0; y <  dungeonDimensionsColumns; y++)
+            {
+                Tile newTile = new Tile();
+                newTile = fullWall;
+                newTile.xVal = x; 
+                newTile.yVal = y;
+                tiles[x, y] = newTile;
+            }
         }
     }
-    void DrawBorder()
+
+    void InstantiateDungeon()
     {
-        for(int x = 0; x < dungeonDimensionsColumns; x++)
+        for (int x = 0; x < dungeonDimensionsRows; x++)
         {
-            if (tiles[0,x] == null)
+            for (int y = 0; y < dungeonDimensionsColumns; y++)
             {
-                tiles[0,x] = fullWall;
-                Instantiate(fullWallPrefab, new Vector3(x * 5, 0, 0), Quaternion.identity);
+                GameObject newObj = Instantiate(tiles[x, y].tileObject, new Vector3(x * 5, 0, y * 5), Quaternion.identity);
+                // tiles[x, y] = newObj.AddComponent<Tile>();
             }
         }
-
-        for (int x = 0; x < dungeonDimensionsColumns; x++)
-        {
-            if (tiles[dungeonDimensionsRows - 1, x] == null)
-            {
-                tiles[dungeonDimensionsRows - 1, x] = fullWall;
-                Instantiate(fullWallPrefab, new Vector3(x * 5, 0, (dungeonDimensionsRows -1) * 5), Quaternion.identity);
-            }
-        }
-        
-        for (int z = 0; z < dungeonDimensionsRows; z++)
-        {
-            if (tiles[z, 0] == null)
-            {
-                tiles[z, 0] = fullWall;
-                Instantiate(fullWallPrefab, new Vector3(0, 0, z * 5), Quaternion.identity);
-            }
-        }
-        
-        for (int z = 0; z < dungeonDimensionsRows; z++)
-        {
-            if (tiles[z, dungeonDimensionsColumns - 1] == null)
-            {
-                tiles[z, dungeonDimensionsColumns - 1] = fullWall;
-                Instantiate(fullWallPrefab, new Vector3((dungeonDimensionsColumns - 1) * 5, 0, z * 5), Quaternion.identity);
-            }
-        }
-
     }
 
     void PickStart()
     {
-        Tile picked = tiles[0, 0];
-        int randomRow = -1;
-        int randomCol = -1;
-
-        while(picked != null)
-        {
-            randomRow = Random.Range(1, dungeonDimensionsRows);
-            randomCol = Random.Range(1, dungeonDimensionsColumns);
-
-            picked = tiles[randomRow, randomCol];
-        }
+        int randomRow = Random.Range(2, dungeonDimensionsRows);
+        int randomCol = Random.Range(2, dungeonDimensionsColumns);
 
         startX = randomRow;
         startY = randomCol;
 
-        PickTile(startX, startY, endsTileList);
-    }
+        Debug.Log(startX);
+        Debug.Log(startY);
 
-    void PickEnd()
-    {
-        Tile picked = tiles[0, 0];
-        int randomRow = -1;
-        int randomCol = -1;
+        Debug.Log(tiles[startX, startY].tileObject.name);
 
-        while (picked != null)
-        {
-            randomRow = Random.Range(1, dungeonDimensionsRows);
-            randomCol = Random.Range(1, dungeonDimensionsColumns);
-
-            picked = tiles[randomRow, randomCol];
-        }
-
-        endX = randomRow;
-        endY = randomCol;
-
-        PickTile(randomRow, randomCol, endsTileList);
+        Debug.Log(tiles[startX, startY].xVal);
+        Debug.Log(tiles[startX, startY].yVal);
+        PickTile(tiles[startX, startY], endsTileList);
     }
 
     void BuildMaze(Tile subjectTile)
     {
-        Debug.Log(subjectTile.tileObject.name);
-
-        if (subjectTile.exitN == true && tiles[subjectTile.x, subjectTile.y + 1] == null) 
+        if (subjectTile.exitN == true)
         {
-            PickTile(subjectTile.x, subjectTile.y + 1, tileList);
-            nextTiles.Enqueue(tiles[subjectTile.x, subjectTile.y + 1]);
+            nextTiles.Enqueue(tiles[subjectTile.xVal + 1, subjectTile.yVal]);
         }
 
-        // if (subjectTile.exitE == true && tiles[subjectTile.x - 1, subjectTile.y] == null)
-        // {
-        //     PickTile(subjectTile.x, subjectTile.y + 1, tileList);
-        //     nextTiles.Enqueue(tiles[subjectTile.x - 1, subjectTile.y]);
-        // }
-        // 
-        // if (subjectTile.exitS == true && tiles[subjectTile.x, subjectTile.y - 1] == null)
-        // {
-        //     PickTile(subjectTile.x, subjectTile.y + 1, tileList);
-        //     nextTiles.Enqueue(tiles[subjectTile.x, subjectTile.y - 1]);
-        // }
-        // 
-        // if (subjectTile.exitW == true && tiles[subjectTile.x + 1, subjectTile.y] == null)
-        // {
-        //     PickTile(subjectTile.x, subjectTile.y + 1, tileList);
-        //     nextTiles.Enqueue(tiles[subjectTile.x + 1, subjectTile.y]);
-        // }
+        if (subjectTile.exitE == true) //  && tiles[subjectTile.x - 1, subjectTile.y].edge == false
+        {
+            nextTiles.Enqueue(tiles[subjectTile.xVal, subjectTile.yVal - 1]);
+        }
+        
+        if (subjectTile.exitS == true)
+        {
+            nextTiles.Enqueue(tiles[subjectTile.xVal - 1, subjectTile.yVal]);
+        }
+        
+        if (subjectTile.exitW == true)
+        {
+            nextTiles.Enqueue(tiles[subjectTile.xVal, subjectTile.yVal + 1]);
+        }
     }
 
-    void PickTile(int row, int col, List<Tile> possibles)
+    void PickTile(Tile input, List<Tile> possibles)
     {
         List<Tile> remove = new List<Tile>();
 
-        if (tiles[row, col + 1] != null)
+        if (input.xVal > 1)
         {
-            if (tiles[row, col + 1].exitS == true)
+            Debug.Log(tiles[startX, startY].tileObject.name);
+            Debug.Log(tiles[startX, startY].xVal);
+            Debug.Log(tiles[startX, startY].yVal);
+            Debug.Log("X: " + input.xVal + " Y: " + input.yVal);
+            Debug.Log(tiles[input.xVal + 1, input.yVal].tileObject.name);
+
+            if (tiles[input.xVal + 1, input.yVal].exitS == true)
             {
                 foreach (Tile tile in possibles)
                 {
@@ -292,35 +269,36 @@ public class TileGenerator : MonoBehaviour
             }
         }
 
-        if (tiles[row + 1, col] != null)
+        if (input.xVal < dungeonDimensionsRows - 1)
         {
-            if (tiles[row + 1, col].exitE == true)
+            if(tiles[input.xVal - 1, input.yVal].exitN == true)
+            {
+                foreach (Tile tile in possibles)
+                {
+                    if (tile.exitS == false) remove.Add(tile);
+                }
+            }
+        }
+
+        if (input.yVal > 1)
+        {
+            if (tiles[input.xVal, input.yVal - 1].exitE == true)
             {
                 foreach (Tile tile in possibles)
                 {
                     if (tile.exitW == false) remove.Add(tile);
                 }
             }
+
         }
 
-        if (tiles[row - 1, col] != null)
+        if (input.yVal < dungeonDimensionsColumns - 1)
         {
-            if (tiles[row - 1, col].exitW == true)
+            if(tiles[input.xVal, input.yVal + 1].exitW == true)
             {
                 foreach (Tile tile in possibles)
                 {
                     if (tile.exitE == false) remove.Add(tile);
-                }
-            }
-        }
-
-        if (tiles[row, col - 1] != null)
-        {
-            if (tiles[row, col - 1].exitN == true)
-            {
-                foreach (Tile tile in possibles)
-                {
-                    if (tile.exitS == false) remove.Add(tile);
                 }
             }
         }
@@ -331,10 +309,7 @@ public class TileGenerator : MonoBehaviour
         }
 
         Tile chosen = possibles[Random.Range(0, possibles.Count - 1)];
-        chosen.x = row;
-        chosen.y = col;
-        tiles[row, col] = chosen;
-        Instantiate(chosen.tileObject, new Vector3(col * 5, 0, row * 5), chosen.tileObject.transform.rotation);
+        tiles[input.xVal, input.yVal] = chosen;
     }
 
     // Update is called once per frame
@@ -351,8 +326,10 @@ public class Tile
     public bool exitE;
     public bool exitW;
 
-    public int x;
-    public int y;
+    public bool edge = false;
+
+    public int xVal;
+    public int yVal;
 
     public GameObject tileObject;
 }

@@ -169,7 +169,7 @@ MonoBehaviour:
   tCornerCPrefab: {fileID: 5904044617458815767, guid: 7eca37acb91d67c4bbd4d25a48001120, type: 3}
   tCornerDPrefab: {fileID: 5904044617458815767, guid: 380dfdbf69f919d40956cd7aa1d488b8, type: 3}
   dungeonDimensionsRows: 20
-  dungeonDimensionsColumns: 15
+  dungeonDimensionsColumns: 20
 --- !u!4 &139229380
 Transform:
   m_ObjectHideFlags: 0
