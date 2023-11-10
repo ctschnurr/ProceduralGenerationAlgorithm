@@ -43,8 +43,9 @@ public class TileGenerator : MonoBehaviour
     static Tile tCornerC = new Tile();
     static Tile tCornerD = new Tile();
 
-    List<Tile> tileList = new List<Tile> { cornerA, cornerB, cornerC, cornerD, hallwayH, hallwayV, intersection, startA, startB, startC, startD };
-    List<Tile> endsTileList = new List<Tile> { startA, startB, startC, startD };
+    List<Tile> tileList;
+    List<Tile> endsTileList;
+    List<GameObject> allTiles;
 
     static int startX;
     static int startY;
@@ -64,16 +65,16 @@ public class TileGenerator : MonoBehaviour
         fullWall.exitW = false;
         fullWall.tileObject = fullWallPrefab;
 
-        cornerA.exitN = true;
+        cornerA.exitN = false;
         cornerA.exitE = true;
-        cornerA.exitS = false;
+        cornerA.exitS = true;
         cornerA.exitW = false;
         cornerA.tileObject = cornerAPrefab;
 
         cornerB.exitN = false;
-        cornerB.exitE = true;
+        cornerB.exitE = false;
         cornerB.exitS = true;
-        cornerB.exitW = false;
+        cornerB.exitW = true;
         cornerB.tileObject = cornerBPrefab;
 
         cornerC.exitN = true;
@@ -83,9 +84,9 @@ public class TileGenerator : MonoBehaviour
         cornerC.tileObject = cornerCPrefab;
 
         cornerD.exitN = true;
-        cornerD.exitE = false;
+        cornerD.exitE = true;
         cornerD.exitS = false;
-        cornerD.exitW = true;
+        cornerD.exitW = false;
         cornerD.tileObject = cornerDPrefab;
 
         hallwayH.exitN = false;
@@ -107,88 +108,133 @@ public class TileGenerator : MonoBehaviour
         intersection.tileObject = intersectionPrefab;
 
         startA.exitN = false;
-        startA.exitE = true;
-        startA.exitS = false;
+        startA.exitE = false;
+        startA.exitS = true;
         startA.exitW = false;
         startA.tileObject = startAPrefab;
 
-        // START B POINTS NORTH
-        startB.exitN = true;
-        startB.exitE = false;
+        startB.exitN = false;
+        startB.exitE = true;
         startB.exitS = false;
         startB.exitW = false;
         startB.tileObject = startBPrefab;
 
-        startC.exitN = false;
+        startC.exitN = true;
         startC.exitE = false;
         startC.exitS = false;
-        startC.exitW = true;
+        startC.exitW = false;
         startC.tileObject = startCPrefab;
 
         startD.exitN = false;
         startD.exitE = false;
-        startD.exitS = true;
-        startD.exitW = false;
+        startD.exitS = false;
+        startD.exitW = true;
         startD.tileObject = startDPrefab;
 
-        tCornerA.exitN = true;
+        tCornerA.exitN = false;
         tCornerA.exitE = true;
         tCornerA.exitS = true;
-        tCornerA.exitW = false;
+        tCornerA.exitW = true;
         tCornerA.tileObject = tCornerAPrefab;
 
         tCornerB.exitN = true;
         tCornerB.exitE = true;
-        tCornerB.exitS = false;
-        tCornerB.exitW = true;
+        tCornerB.exitS = true;
+        tCornerB.exitW = false;
         tCornerB.tileObject = tCornerBPrefab; ;
 
         tCornerC.exitN = true;
-        tCornerC.exitE = false;
-        tCornerC.exitS = true;
+        tCornerC.exitE = true;
+        tCornerC.exitS = false;
         tCornerC.exitW = true;
         tCornerC.tileObject = tCornerCPrefab;
 
-        tCornerD.exitN = false;
-        tCornerD.exitE = true;
+        tCornerD.exitN = true;
+        tCornerD.exitE = false;
         tCornerD.exitS = true;
         tCornerD.exitW = true;
         tCornerD.tileObject = tCornerDPrefab;
+
+        tileList = new List<Tile> { hallwayH, hallwayV, hallwayH, hallwayV, cornerA, cornerB, cornerC, cornerD, tCornerA, tCornerB, tCornerC, tCornerD, intersection };
+
+        endsTileList = new List<Tile> { startA, startB, startC, startD };
+
+        allTiles = new ();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKey(KeyCode.Escape)) Application.Quit();
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            dungeonDimensionsRows = 15;
+            dungeonDimensionsColumns = 10;
+            RunAgain();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            dungeonDimensionsRows = 20;
+            dungeonDimensionsColumns = 15;
+            RunAgain();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            dungeonDimensionsRows = 25;
+            dungeonDimensionsColumns = 20;
+            RunAgain();
+        }
+
     }
     void Start()
     {
+        dungeonDimensionsRows = 15;
+        dungeonDimensionsColumns = 10;
         tiles = new Tile[dungeonDimensionsRows, dungeonDimensionsColumns];
         SetupTiles();
         CreateBase();
         PickStart();
-        //BuildMaze(tiles[startX, startY]);
 
-
-
-        // Tile next = nextTiles.Dequeue();
-        // BuildMaze(next);
-        // PickTile(next, tileList);
+        while (nextTiles.Count > 0)
+        {
+            Tile next = nextTiles.Dequeue();
+            List<Tile> tempList = new List<Tile>(tileList);
+            PickTile(next.xVal, next.yVal, tempList);
+        }
 
         InstantiateDungeon();
-        // DrawBorder();
-        // BuildMaze(tiles[startX, startY]);
+    }
 
-        // while (nextTiles.Count > 0)
-        // {
-        //     Tile next = nextTiles.Dequeue();
-        //     BuildMaze(next);
-        // }
+    void RunAgain()
+    {
+        foreach(GameObject tile in allTiles)
+        {
+            Destroy(tile);
+        }
+
+        tiles = new Tile[dungeonDimensionsRows, dungeonDimensionsColumns];
+        SetupTiles();
+        CreateBase();
+        PickStart();
+
+        while (nextTiles.Count > 0)
+        {
+            Tile next = nextTiles.Dequeue();
+            List<Tile> tempList = new List<Tile>(tileList);
+            PickTile(next.xVal, next.yVal, tempList);
+        }
+
+        InstantiateDungeon();
     }
 
     void CreateBase()
     {
         for (int x = 0; x < dungeonDimensionsRows; x++)
         {
-            for (int y  = 0; y <  dungeonDimensionsColumns; y++)
+            for (int y = 0; y < dungeonDimensionsColumns; y++)
             {
                 Tile newTile = new Tile();
-                newTile = fullWall;
-                newTile.xVal = x; 
+                newTile.tileObject = fullWall.tileObject;
+                newTile.xVal = x;
                 newTile.yVal = y;
                 tiles[x, y] = newTile;
             }
@@ -201,105 +247,95 @@ public class TileGenerator : MonoBehaviour
         {
             for (int y = 0; y < dungeonDimensionsColumns; y++)
             {
-                GameObject newObj = Instantiate(tiles[x, y].tileObject, new Vector3(x * 5, 0, y * 5), Quaternion.identity);
-                // tiles[x, y] = newObj.AddComponent<Tile>();
+                GameObject newObj = Instantiate(tiles[x, y].tileObject, new Vector3((x - dungeonDimensionsRows / 2) * 5, 0, (y - dungeonDimensionsColumns / 2) * 5), Quaternion.identity);
+                newObj.name = tiles[x, y].xVal + "/" + tiles[x, y].yVal;
+
+                allTiles.Add(newObj);
             }
         }
     }
 
     void PickStart()
     {
-        int randomRow = Random.Range(2, dungeonDimensionsRows);
-        int randomCol = Random.Range(2, dungeonDimensionsColumns);
+        int randomRow = Random.Range(3, dungeonDimensionsRows - 2);
+        int randomCol = Random.Range(3, dungeonDimensionsColumns - 2);
 
         startX = randomRow;
         startY = randomCol;
 
-        Debug.Log(startX);
-        Debug.Log(startY);
+        Debug.Log(startX + "/" + startY);
 
-        Debug.Log(tiles[startX, startY].tileObject.name);
-
-        Debug.Log(tiles[startX, startY].xVal);
-        Debug.Log(tiles[startX, startY].yVal);
-        PickTile(tiles[startX, startY], endsTileList);
+        PickTile(startX, startY, endsTileList);
     }
 
-    void BuildMaze(Tile subjectTile)
+    void PickTile(int x, int y, List<Tile> possibles)
     {
-        if (subjectTile.exitN == true)
-        {
-            nextTiles.Enqueue(tiles[subjectTile.xVal + 1, subjectTile.yVal]);
-        }
+        if (x < 1 || x > dungeonDimensionsRows - 2) return;
+        if (y < 1 || y > dungeonDimensionsColumns - 2) return;
 
-        if (subjectTile.exitE == true) //  && tiles[subjectTile.x - 1, subjectTile.y].edge == false
-        {
-            nextTiles.Enqueue(tiles[subjectTile.xVal, subjectTile.yVal - 1]);
-        }
-        
-        if (subjectTile.exitS == true)
-        {
-            nextTiles.Enqueue(tiles[subjectTile.xVal - 1, subjectTile.yVal]);
-        }
-        
-        if (subjectTile.exitW == true)
-        {
-            nextTiles.Enqueue(tiles[subjectTile.xVal, subjectTile.yVal + 1]);
-        }
-    }
-
-    void PickTile(Tile input, List<Tile> possibles)
-    {
         List<Tile> remove = new List<Tile>();
 
-        if (input.xVal > 1)
+        if (tiles[x + 1, y].tileObject != fullWallPrefab && tiles[x + 1, y].exitW == true)
         {
-            Debug.Log(tiles[startX, startY].tileObject.name);
-            Debug.Log(tiles[startX, startY].xVal);
-            Debug.Log(tiles[startX, startY].yVal);
-            Debug.Log("X: " + input.xVal + " Y: " + input.yVal);
-            Debug.Log(tiles[input.xVal + 1, input.yVal].tileObject.name);
-
-            if (tiles[input.xVal + 1, input.yVal].exitS == true)
+            foreach (Tile tile in possibles)
             {
-                foreach (Tile tile in possibles)
-                {
-                    if (tile.exitN == false) remove.Add(tile);
-                }
+                if (tile.exitE == false) remove.Add(tile);
             }
         }
 
-        if (input.xVal < dungeonDimensionsRows - 1)
+        if (tiles[x + 1, y].tileObject != fullWallPrefab && tiles[x + 1, y].exitW == false)
         {
-            if(tiles[input.xVal - 1, input.yVal].exitN == true)
+            foreach (Tile tile in possibles)
             {
-                foreach (Tile tile in possibles)
-                {
-                    if (tile.exitS == false) remove.Add(tile);
-                }
+                if (tile.exitE == true) remove.Add(tile);
             }
         }
 
-        if (input.yVal > 1)
+        if (tiles[x - 1, y].tileObject != fullWallPrefab && tiles[x - 1, y].exitE == true)
         {
-            if (tiles[input.xVal, input.yVal - 1].exitE == true)
+            foreach (Tile tile in possibles)
             {
-                foreach (Tile tile in possibles)
-                {
-                    if (tile.exitW == false) remove.Add(tile);
-                }
+                if (tile.exitW == false) remove.Add(tile);
             }
-
         }
 
-        if (input.yVal < dungeonDimensionsColumns - 1)
+        if (tiles[x - 1, y].tileObject != fullWallPrefab && tiles[x - 1, y].exitE == false)
         {
-            if(tiles[input.xVal, input.yVal + 1].exitW == true)
+            foreach (Tile tile in possibles)
             {
-                foreach (Tile tile in possibles)
-                {
-                    if (tile.exitE == false) remove.Add(tile);
-                }
+                if (tile.exitW == true) remove.Add(tile);
+            }
+        }
+
+        if (tiles[x, y - 1].tileObject != fullWallPrefab && tiles[x, y - 1].exitN == true)
+        {
+            foreach (Tile tile in possibles)
+            {
+                if (tile.exitS == false) remove.Add(tile);
+            }
+        }
+
+        if (tiles[x, y - 1].tileObject != fullWallPrefab && tiles[x, y - 1].exitN == false)
+        {
+            foreach (Tile tile in possibles)
+            {
+                if (tile.exitS == true) remove.Add(tile);
+            }
+        }
+
+        if (tiles[x, y + 1].tileObject != fullWallPrefab && tiles[x, y + 1].exitS == true)
+        {
+            foreach (Tile tile in possibles)
+            {
+                if (tile.exitN == false) remove.Add(tile);
+            }
+        }
+
+        if (tiles[x, y + 1].tileObject != fullWallPrefab && tiles[x, y + 1].exitS == false)
+        {
+            foreach (Tile tile in possibles)
+            {
+                if (tile.exitN == true) remove.Add(tile);
             }
         }
 
@@ -308,16 +344,69 @@ public class TileGenerator : MonoBehaviour
             possibles.Remove(tile);
         }
 
-        Tile chosen = possibles[Random.Range(0, possibles.Count - 1)];
-        tiles[input.xVal, input.yVal] = chosen;
+        Tile temp = tiles[x, y];
+        if (possibles.Count > 0) temp = possibles[Random.Range(0, possibles.Count)];
+        temp.xVal = tiles[x, y].xVal;
+        temp.yVal = tiles[x, y].yVal;
+        tiles[x, y] = temp;
+
+
+        BuildMaze(tiles[x, y]);
+     
     }
 
-    // Update is called once per frame
-    void Update()
+    void BuildMaze(Tile subjectTile)
     {
-        
+        if (subjectTile.exitE == true && subjectTile.xVal < dungeonDimensionsRows - 1)
+        {
+            Debug.Log("EAST CHECK");
+
+            if (tiles[subjectTile.xVal + 1, subjectTile.yVal].tileObject == fullWallPrefab)
+            {
+                nextTiles.Enqueue(tiles[subjectTile.xVal + 1, subjectTile.yVal]);
+                Debug.Log("EAST FIRE");
+            }
+        }
+
+        if (subjectTile.exitS == true && subjectTile.yVal > 1)
+        {
+            Debug.Log("SOUTH CHECK");
+
+            if (tiles[subjectTile.xVal, subjectTile.yVal - 1].tileObject == fullWallPrefab)
+            {
+                nextTiles.Enqueue(tiles[subjectTile.xVal, subjectTile.yVal - 1]);
+                Debug.Log("SOUTH FIRE");
+            }
+        }
+
+        if (subjectTile.exitW == true && subjectTile.xVal > 1)
+        {
+            Debug.Log("WEST CHECK");
+
+            if (tiles[subjectTile.xVal - 1, subjectTile.yVal].tileObject == fullWallPrefab)
+            {
+                nextTiles.Enqueue(tiles[subjectTile.xVal - 1, subjectTile.yVal]);
+                Debug.Log("WEST FIRE");
+            }
+
+        }
+
+        if (subjectTile.exitN == true && subjectTile.yVal < dungeonDimensionsColumns - 1)
+        {
+            Debug.Log("NORTH CHECK");
+
+            if (tiles[subjectTile.xVal, subjectTile.yVal + 1].tileObject == fullWallPrefab)
+            {
+                nextTiles.Enqueue(tiles[subjectTile.xVal, subjectTile.yVal + 1]);
+                Debug.Log("NORTH FIRE");
+            }
+        }
+
+        Debug.Log(nextTiles.Count);
+
     }
 }
+
 
 public class Tile
 {
